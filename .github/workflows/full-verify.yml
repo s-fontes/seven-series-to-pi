@@ -1,0 +1,24 @@
+name: full-verify
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Enforce dev PRs to main
+        if: github.event.pull_request.base.ref == 'main'
+        run: |
+          if [ "${{ github.event.pull_request.head.ref }}" != "dev" ]; then
+            echo "main only accepts PRs from dev" >&2
+            exit 1
+          fi
+      - name: Build container
+        run: docker build -t seven-series -f .devcontainer/Dockerfile .
+      - name: Verify
+        run: docker run --rm -v ${{ github.workspace }}:/workspace seven-series bash -c "cd /workspace && make build && make verify"
