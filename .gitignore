@@ -1,0 +1,9 @@
+/build/
+__pycache__/
+*.pyc
+*.o
+*.so
+.vscode/
+out/data/*.csv
+out/graphs/*.png
+
